@@ -1,0 +1,31 @@
+{
+  "name": "react-native-draggable-backdrop",
+  "version": "0.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvlrSajjad/react-native-draggable-backdrop.git"
+  },
+  "keywords": [
+    "draggable",
+    "backdrop",
+    "draggable",
+    "backdrop",
+    "react",
+    "native",
+    "react",
+    "native",
+    "draggable",
+    "backdrop"
+  ],
+  "author": "lvlrsajjad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lvlrSajjad/react-native-draggable-backdrop/issues"
+  },
+  "homepage": "https://github.com/lvlrSajjad/react-native-draggable-backdrop#readme"
+}
