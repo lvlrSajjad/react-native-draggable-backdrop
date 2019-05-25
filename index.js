@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {StyleSheet, Animated, View, PanResponder, Dimensions, TouchableOpacity} from 'react-native';
+import {StyleSheet, Animated, View, PanResponder, Dimensions, TouchableOpacity, BackHandler, TouchableWithoutFeedback} from 'react-native';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -17,11 +17,9 @@ type
 Props = {};
 export default class App extends Component<Props> {
 
-    _animatedValue = new Animated.Value(0);
-    _animatedValue2 = new Animated.Value(32);
-    _animatedValue3 = new Animated.Value(0);
     _animatedValue4 = new Animated.Value(0);
     _animatedValue5 = new Animated.Value(height - 98);
+    _animatedValue3 = new Animated.Value(0);
     _collapsed = true;
     _expanded = false;
 
@@ -41,7 +39,9 @@ export default class App extends Component<Props> {
         onPanResponderMove: (evt, gestureState) => {
             const moveY = Math.round(height - gestureState.moveY);
             if (moveY <= height - 98) {
+                console.log(height - gestureState.moveY);
                 this._animatedValue5.setValue(-moveY + height - 98);
+                this._animatedValue3.setValue((height - gestureState.moveY) / height )
             }
             // The most recent move distance is gestureState.move{X,Y}
 
@@ -51,11 +51,13 @@ export default class App extends Component<Props> {
         onPanResponderTerminationRequest: (evt, gestureState) => true,
         onPanResponderRelease: (evt, gestureState) => {
             const moveY = height - gestureState.moveY;
+            const dy = gestureState.dy;
 
-            if (moveY > height / 2) {
+            if (dy <= 0) {
                 this.expand();
-            } else {
+            } else if (dy > 0) {
                 this.collapse();
+
             }
             // The user has released all touches while this view is the
             // responder. This typically means a gesture has succeeded
@@ -75,121 +77,138 @@ export default class App extends Component<Props> {
 
     expand = () => {
         Animated.parallel([
-            Animated.spring(this._animatedValue, {
-                toValue: width,
-                duration: 200,
-            }),
             Animated.spring(this._animatedValue5, {
                 toValue: 0,
-                duration: 200,
-            }),
-            Animated.spring(this._animatedValue2, {
-                toValue: 4,
-                duration: 200,
-
-            }),
-            Animated.spring(this._animatedValue3, {
-                toValue: height,
-                duration: 200,
-
+                duration: 200
             }),
             Animated.spring(this._animatedValue4, {
                 toValue: 1,
                 duration: 200,
-
+                useNativeDriver: true
+            }),
+            Animated.spring(this._animatedValue3, {
+                toValue: 1,
+                duration: 200
             })
         ]).start()
     };
     collapse = () => {
-
         Animated.parallel([
-            Animated.spring(this._animatedValue, {
-                toValue: 0,
-                duration: 200,
-
-            }),
             Animated.spring(this._animatedValue5, {
                 toValue: height - 98,
                 duration: 200,
             }),
-            Animated.spring(this._animatedValue2, {
-                toValue: 32,
-                duration: 200,
-
-            }),
-            Animated.spring(this._animatedValue3, {
-                toValue: 0,
-                duration: 200,
-
-            }),
             Animated.spring(this._animatedValue4, {
                 toValue: 0,
                 duration: 200,
-
+                useNativeDriver: true
+            }),
+            Animated.spring(this._animatedValue3, {
+                toValue: 0,
+                duration: 200
             })
         ]).start()
-    };
+    }
+
+
+    componentDidMount() {
+        if (this.props.handleBackPress) {
+            BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.props.handleBackPress) {
+            BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+        }
+    }
+
+    handleBackPress = () => {
+        this.collapse(); // works best when the goBack is async
+        return true;
+    }
 
 
     render() {
+        const {marginHorizontal, backgroundColor, radius, elevation, onExpand, children, indicatorColor, showBackground} = this.props;
+
         return (
-            <Animated.View style={{
-                position: 'absolute',
-                right: this.props.marginHorizontal?this.props.marginHorizontal:16,
-                left: this.props.marginHorizontal?this.props.marginHorizontal:16,
-                bottom: 0,
-                backgroundColor: this.props.backgroundColor,
-                minWidth: 56,
-                borderRadius: 0,
-                borderTopLeftRadius: this.props.radius? this.props.radius : 16,
-                borderTopRightRadius: this.props.radius? this.props.radius : 16,
-                width: width - 32,
-                maxWidth: width - 32,
-                maxHeight: height - 56,
-                //  height: this._animatedValue5,
-                height: height - 56,
-                minHeight: 56,
-                alignItems: 'center',
-                justifyContent: 'center',
-                elevation: this.props.elevation? this.props.elevation : 16,
-                //  backgroundColor:'white',
-                shadowColor: 'black',
-                shadowOffset: {
-                    width: 0,
-                    height: 16
-                },
-                shadowRadius: 16,
-                shadowOpacity: 0.24,
-                zIndex: 100,
-                paddingTop: 32,
-                transform: [{translateY: this._animatedValue5}]
-            }}>
-                <Animated.View {...this._panResponder.panHandlers} style={{
-                    backgroundColor: 'transparent',
-                    height: 32,
-                    width: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (this._collapsed) {
-                                this.expand();
-                                if (this.props.onExpand) {
-                                    this.props.onExpand();
-                                }
-                            }
-                        }}
-                        style={{width: '100%', height: 32}}>
-                        <View style={{height: 6, borderRadius: 3, width: 64, backgroundColor: '#424242'}}/>
-                    </TouchableOpacity>
-
+            <Animated.View style={{position: 'absolute', height: '100%', width: '100%'}}>
+                {showBackground &&
+                <Animated.View
+                    style={{
+                        opacity: this._animatedValue3,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        position: 'absolute',
+                        height: '100%',
+                        width: '100%'
+                    }}>
+                    <TouchableOpacity style={{height: '100%', width: '100%'}} onPress={()=>this.collapse()}/>
                 </Animated.View>
+                }
+                <Animated.View style={{
+                    position: 'absolute',
+                    right: marginHorizontal ? marginHorizontal : 16,
+                    left: marginHorizontal ? marginHorizontal : 16,
+                    bottom: 0,
+                    backgroundColor: this.props.backgroundColor,
+                    minWidth: 56,
+                    borderRadius: 0,
+                    borderTopLeftRadius: radius ? radius : 16,
+                    borderTopRightRadius: radius ? radius : 16,
+                    width: marginHorizontal ? width - 2 * marginHorizontal : width - 32,
+                    height: height - 56,
+                    minHeight: 56,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    elevation: elevation ? elevation : 16,
+                    shadowColor: 'black',
+                    shadowOffset: {
+                        width: 0,
+                        height: 16
+                    },
+                    shadowRadius: 16,
+                    shadowOpacity: 0.24,
+                    zIndex: 100,
+                    paddingTop: 32,
+                    transform: [{translateY: this._animatedValue5}]
+                }}>
+                    <Animated.View {...this._panResponder.panHandlers} style={{
+                        backgroundColor: 'transparent',
+                        height: 32,
+                        width: '100%',
+                        position: 'absolute',
+                        top: 0,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (this._collapsed) {
+                                    this.expand();
+                                    if (onExpand) {
+                                        onExpand();
+                                    }
+                                }
+                            }}
+                            style={{
+                                width: '100%', height: 32,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                            <View style={{
+                                height: 6,
+                                borderRadius: 3,
+                                width: 64,
+                                backgroundColor: indicatorColor ? indicatorColor : '#424242'
+                            }}/>
+                        </TouchableOpacity>
 
-                <Animated.View style={{width: '100%', height: '100%', opacity: this._animatedValue4}}>
-                    {this.props.children}
+                    </Animated.View>
+
+                    <Animated.View style={{width: '100%', height: '100%', opacity: this._animatedValue4}}>
+                        {children}
+                    </Animated.View>
                 </Animated.View>
             </Animated.View>
         );
