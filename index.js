@@ -14,11 +14,11 @@ const height = Dimensions.get('window').height;
 
 
 type
-Props = {};
+  Props = {};
 export default class App extends Component<Props> {
 
     _animatedValue4 = new Animated.Value(0);
-    _animatedValue5 = new Animated.Value(height - 98);
+    _animatedValue5 = new Animated.Value(height - 74);
     _animatedValue3 = new Animated.Value(0);
     _collapsed = true;
     _expanded = false;
@@ -38,9 +38,8 @@ export default class App extends Component<Props> {
         },
         onPanResponderMove: (evt, gestureState) => {
             const moveY = Math.round(height - gestureState.moveY);
-            if (moveY <= height - 98) {
-                console.log(height - gestureState.moveY);
-                this._animatedValue5.setValue(-moveY + height - 98);
+            if (moveY <= height - 74) {
+                this._animatedValue5.setValue(-moveY + height - 74);
                 this._animatedValue3.setValue((height - gestureState.moveY) / height )
             }
             // The most recent move distance is gestureState.move{X,Y}
@@ -78,7 +77,7 @@ export default class App extends Component<Props> {
     expand = () => {
         Animated.parallel([
             Animated.spring(this._animatedValue5, {
-                toValue: 0,
+                toValue: 24,
                 duration: 200
             }),
             Animated.spring(this._animatedValue4, {
@@ -98,7 +97,7 @@ export default class App extends Component<Props> {
     collapse = () => {
         Animated.parallel([
             Animated.spring(this._animatedValue5, {
-                toValue: height - 98,
+                toValue: height - 74,
                 duration: 200,
             }),
             Animated.spring(this._animatedValue4, {
@@ -137,84 +136,85 @@ export default class App extends Component<Props> {
         const {marginHorizontal, backgroundColor, radius, elevation, onExpand, children, indicatorColor, showBackground} = this.props;
 
         return (
-            <Animated.View style={{position: 'absolute', height: '100%', width: '100%'}}>
-                {showBackground &&
-                <Animated.View
-                    style={{
-                        opacity: this._animatedValue3,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        position: 'absolute',
-                        height: '100%',
-                        width: '100%'
-                    }}>
-                    <TouchableOpacity style={{height: '100%', width: '100%'}} onPress={()=>this.collapse()}/>
-                </Animated.View>
-                }
-                <Animated.View style={{
+          <Animated.View style={{position: 'absolute', height: '100%', width: '100%'}}>
+              {showBackground &&
+              <Animated.View
+                style={{
+                    opacity: this._animatedValue3,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
                     position: 'absolute',
-                    right: marginHorizontal ? marginHorizontal : 16,
-                    left: marginHorizontal ? marginHorizontal : 16,
-                    bottom: 0,
-                    backgroundColor: this.props.backgroundColor,
-                    minWidth: 56,
-                    borderRadius: 0,
-                    borderTopLeftRadius: radius ? radius : 16,
-                    borderTopRightRadius: radius ? radius : 16,
-                    width: marginHorizontal ? width - 2 * marginHorizontal : width - 32,
-                    height: height - 56,
-                    minHeight: 56,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    elevation: elevation ? elevation : 16,
-                    shadowColor: 'black',
-                    shadowOffset: {
-                        width: 0,
-                        height: 16
-                    },
-                    shadowRadius: 16,
-                    shadowOpacity: 0.24,
-                    zIndex: 100,
-                    paddingTop: 32,
-                    transform: [{translateY: this._animatedValue5}]
+                    height: '100%',
+                    width: '100%'
                 }}>
-                    <Animated.View {...this._panResponder.panHandlers} style={{
-                        backgroundColor: 'transparent',
-                        height: 32,
-                        width: '100%',
-                        position: 'absolute',
-                        top: 0,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <TouchableOpacity
-                            onPress={() => {
-                                if (this._collapsed) {
-                                    this.expand();
-                                    if (onExpand) {
-                                        onExpand();
-                                    }
+                  <TouchableOpacity style={{height: '100%', width: '100%'}} onPress={()=>this.collapse()}/>
+              </Animated.View>
+              }
+              <Animated.View style={{
+                  position: 'absolute',
+                  right: marginHorizontal ? marginHorizontal : 16,
+                  left: marginHorizontal ? marginHorizontal : 16,
+                  bottom: 0,
+                  backgroundColor: this.props.backgroundColor,
+                  minWidth: 56,
+                  borderRadius: 0,
+                  borderTopLeftRadius: radius ? radius : 16,
+                  borderTopRightRadius: radius ? radius : 16,
+                  width: marginHorizontal ? width - 2 * marginHorizontal : width - 32,
+                  height: height - 32,
+                  paddingBottom:32,
+                  minHeight: 56,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  elevation: elevation ? elevation : 16,
+                  shadowColor: 'black',
+                  shadowOffset: {
+                      width: 0,
+                      height: 16
+                  },
+                  shadowRadius: 16,
+                  shadowOpacity: 0.24,
+                  zIndex: 100,
+                  paddingTop: 32,
+                  transform: [{translateY: this._animatedValue5}]
+              }}>
+                  <Animated.View {...this._panResponder.panHandlers} style={{
+                      backgroundColor: 'transparent',
+                      height: 32,
+                      width: '100%',
+                      position: 'absolute',
+                      top: 0,
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                  }}>
+                      <TouchableOpacity
+                        onPress={() => {
+                            if (this._collapsed) {
+                                this.expand();
+                                if (onExpand) {
+                                    onExpand();
                                 }
-                            }}
-                            style={{
-                                width: '100%', height: 32,
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                            <View style={{
-                                height: 6,
-                                borderRadius: 3,
-                                width: 64,
-                                backgroundColor: indicatorColor ? indicatorColor : '#424242'
-                            }}/>
-                        </TouchableOpacity>
+                            }
+                        }}
+                        style={{
+                            width: '100%', height: 32,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                          <View style={{
+                              height: 6,
+                              borderRadius: 3,
+                              width: 64,
+                              backgroundColor: indicatorColor ? indicatorColor : '#424242'
+                          }}/>
+                      </TouchableOpacity>
 
-                    </Animated.View>
+                  </Animated.View>
 
-                    <Animated.View style={{width: '100%', height: '100%', opacity: this._animatedValue4}}>
-                        {children}
-                    </Animated.View>
-                </Animated.View>
-            </Animated.View>
+                  <Animated.View style={{width: '100%', height: '100%', opacity: this._animatedValue4}}>
+                      {children}
+                  </Animated.View>
+              </Animated.View>
+          </Animated.View>
         );
     }
 }
