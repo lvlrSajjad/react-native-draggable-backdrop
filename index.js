@@ -115,11 +115,6 @@ export default class App extends Component<Props> {
         }
     }
 
-
-    componentDidMount() {
-
-    }
-
     componentWillUnmount() {
         if (this.props.handleBackPress) {
             BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
