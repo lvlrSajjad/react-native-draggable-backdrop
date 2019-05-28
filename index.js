@@ -90,7 +90,10 @@ export default class App extends Component<Props> {
                 toValue: 1,
                 duration: 200
             })
-        ]).start()
+        ]).start();
+        if (this.props.handleBackPress) {
+            BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        }
     };
     collapse = () => {
         Animated.parallel([
@@ -107,14 +110,15 @@ export default class App extends Component<Props> {
                 toValue: 0,
                 duration: 200
             })
-        ]).start()
+        ]).start();
+        if (this.props.handleBackPress) {
+            BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+        }
     }
 
 
     componentDidMount() {
-        if (this.props.handleBackPress) {
-            BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-        }
+
     }
 
     componentWillUnmount() {
